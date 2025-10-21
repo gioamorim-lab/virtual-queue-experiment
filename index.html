@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gamified Waiting Experience Study</title>
+  <style>
+    body {
+      font-family: "Segoe UI", Arial, sans-serif;
+      background: linear-gradient(180deg, #f0f4ff, #fff);
+      text-align: center;
+      margin: 0;
+      padding: 40px;
+    }
+    h1 {
+      color: #2a3d7c;
+    }
+    #progressContainer {
+      width: 80%;
+      height: 30px;
+      background: #ddd;
+      border-radius: 20px;
+      overflow: hidden;
+      margin: 40px auto;
+      border: 2px solid #aaa;
+    }
+    #progressBar {
+      width: 0%;
+      height: 100%;
+      background-color: #4CAF50;
+      transition: width 1s linear;
+    }
+    #gameArea {
+      display: none;
+      margin-top: 30px;
+    }
+    #clickButton {
+      padding: 12px 24px;
+      font-size: 18px;
+      border: none;
+      border-radius: 12px;
+      background: #2a3d7c;
+      color: white;
+      cursor: pointer;
+    }
+    #clickButton:hover {
+      background: #4359a8;
+    }
+    #status {
+      font-size: 18px;
+      margin-top: 20px;
+    }
+    #instructions {
+      max-width: 600px;
+      margin: 20px auto;
+      font-size: 16px;
+      color: #444;
+    }
+    #thankYou {
+      display: none;
+      margin-top: 40px;
+    }
+    #surveyButton {
+      display: inline-block;
+      margin-top: 20px;
+      padding: 12px 28px;
+      font-size: 18px;
+      border: none;
+      border-radius: 10px;
+      background-color: #4CAF50;
+      color: white;
+      text-decoration: none;
+      transition: background 0.3s ease;
+    }
+    #surveyButton:hover {
+      background-color: #45a049;
+    }
+    footer {
+      margin-top: 60px;
+      font-size: 14px;
+      color: #777;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Gamified Waiting Experience Study</h1>
+  <p id="instructions">
+    Thank you for participating! You’ll experience a short virtual wait.  
+    Please stay on the page until the timer finishes.
+  </p>
+
+  <div id="progressContainer">
+    <div id="progressBar"></div>
+  </div>
+
+  <div id="gameArea">
+    <p>While you wait, tap the button as many times as you can!</p>
+    <button id="clickButton">Click Me!</button>
+    <p>Score: <span id="score">0</span></p>
+  </div>
+
+  <p id="status"></p>
+
+  <div id="thankYou">
+    <h2>🎉 Thank You for Participating!</h2>
+    <p>Your feedback helps us understand how gamification affects waiting experiences.</p>
+    <a id="surveyButton" href="#" target="_blank">Continue to Survey</a>
+  </div>
+
+  <footer>
+    © 2025 Virtual Queue Experience Study
+  </footer>
+
+  <script>
+    // -------------------------------
+    // CONFIGURATION
+    // -------------------------------
+    const totalTime = 30; // seconds
+    const surveyLink = "https://forms.gle/GXLKQPJTBuvqJFsq7"; 
+    // -------------------------------
+
+    const progressBar = document.getElementById("progressBar");
+    const status = document.getElementById("status");
+    const gameArea = document.getElementById("gameArea");
+    const clickButton = document.getElementById("clickButton");
+    const scoreDisplay = document.getElementById("score");
+    const thankYou = document.getElementById("thankYou");
+    const surveyButton = document.getElementById("surveyButton");
+
+    let score = 0;
+    let timePassed = 0;
+
+    // Randomly assign participant to a condition
+    const isGamified = Math.random() < 0.5;
+    console.log("Condition:", isGamified ? "Gamified" : "Control");
+
+    if (isGamified) {
+      gameArea.style.display = "block";
+      document.getElementById("instructions").innerHTML += "<br><b>Condition:</b> Game Enabled";
+    } else {
+      document.getElementById("instructions").innerHTML += "<br><b>Condition:</b> No Game";
+    }
+
+    // Increment score when clicking the game button
+    clickButton.addEventListener("click", () => {
+      score++;
+      scoreDisplay.textContent = score;
+    });
+
+    // Timer logic
+    const timer = setInterval(() => {
+      timePassed++;
+      progressBar.style.width = (timePassed / totalTime) * 100 + "%";
+      status.textContent = `Time remaining: ${totalTime - timePassed}s`;
+
+      if (timePassed >= totalTime) {
+        clearInterval(timer);
+        status.textContent = "You're done waiting!";
+        gameArea.style.display = "none";
+        showThankYou();
+      }
+    }, 1000);
+
+    function showThankYou() {
+      thankYou.style.display = "block";
+      // Append condition and score to survey link
+      const url = `${surveyLink}?condition=${isGamified ? "game" : "control"}&score=${score}`;
+      surveyButton.href = url;
+    }
+  </script>
+</body>
+</html>
