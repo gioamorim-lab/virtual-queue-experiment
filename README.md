@@ -19,6 +19,6 @@ Built with:
 - JavaScript
 -  Assistance from ChatGPT
 
-**Data Use:**
+## 📈 Data Use
 All data will be used solely for academic research to analyze the effects of gamification on waiting perception and engagement.  
 Individual responses are anonymized, and no personally identifiable information is collected.
