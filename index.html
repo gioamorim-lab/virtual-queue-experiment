@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Gamified Waiting Experience</title>
+  <title>Waiting Experience Experiment</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -60,12 +60,19 @@
       border-radius: 12px;
       cursor: pointer;
       font-size: 18px;
+      animation-duration: 0.3s;
       transition: transform 0.1s ease, background-color 0.2s ease;
     }
 
-    #clickButton:active {
-      transform: scale(1.2);
+    .clicked {
+      animation: bounce 0.3s ease;
       background-color: #66bb6a;
+    }
+
+    @keyframes bounce {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.3); }
+      100% { transform: scale(1); }
     }
 
     #score {
@@ -79,6 +86,13 @@
       background: #ffffffcc;
       padding: 20px;
       border-radius: 20px;
+      opacity: 0;
+      animation: fadeIn 1s ease forwards;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
     button.surveyBtn {
@@ -126,11 +140,14 @@
     const finalScore = document.getElementById("finalScore");
     const surveyButton = document.getElementById("surveyButton");
 
+    // Randomly assign participant to condition
+    const condition = Math.random() < 0.5 ? "control" : "gamified";
+
     let score = 0;
     let time = 30; // seconds
     let interval;
 
-    // Move button randomly inside the game area
+    // Move the button randomly within the game area
     function moveButton() {
       const areaRect = gameArea.getBoundingClientRect();
       const btnWidth = clickButton.offsetWidth;
@@ -141,7 +158,7 @@
       clickButton.style.top = y + "px";
     }
 
-    // Update progress bar every second
+    // Update the progress bar
     function updateProgress() {
       let elapsed = 0;
       interval = setInterval(() => {
@@ -151,35 +168,47 @@
       }, 1000);
     }
 
-    // Handle button click
-    clickButton.addEventListener("click", () => {
-      score++;
-      scoreDisplay.textContent = "Score: " + score;
-      clickButton.style.transform = "scale(1.2)";
-      setTimeout(() => (clickButton.style.transform = "scale(1)"), 100);
-      moveButton();
-    });
+    // Handle button click for gamified condition
+    if (condition === "gamified") {
+      clickButton.addEventListener("click", () => {
+        score++;
+        scoreDisplay.textContent = "Score: " + score;
+        clickButton.classList.add("clicked");
+        setTimeout(() => clickButton.classList.remove("clicked"), 300);
+        moveButton();
+      });
+    } else {
+      // Hide the button and score if control condition
+      clickButton.style.display = "none";
+      scoreDisplay.style.display = "none";
+    }
 
-    // End game and show results
+    // End game and show fade-in results
     function endGame() {
       clearInterval(interval);
       clickButton.style.display = "none";
       gameArea.style.display = "none";
       scoreDisplay.style.display = "none";
       results.style.display = "block";
-      finalScore.textContent = "Your final score: " + score;
+      finalScore.textContent =
+        condition === "gamified"
+          ? "Your final score: " + score
+          : "Thank you for waiting!";
+      results.style.animation = "fadeIn 1s ease forwards";
 
-      // Add score and condition to survey link
+      // Add score and condition to the survey link
+      const baseLink = "https://forms.gle/GXLKQPJTBuvqJFsq7";
       const surveyLink =
-        "https://forms.gle/GXLKQPJTBuvqJFsq7?entry.1234567890=" +
+        baseLink +
+        "?entry.1111111111=" +
+        encodeURIComponent(condition) +
+        "&entry.2222222222=" +
         encodeURIComponent(score);
-      surveyButton.onclick = () => {
-        window.location.href = surveyLink;
-      };
+      surveyButton.onclick = () => (window.location.href = surveyLink);
     }
 
     // Start experiment
-    moveButton();
+    if (condition === "gamified") moveButton();
     updateProgress();
   </script>
 </body>
